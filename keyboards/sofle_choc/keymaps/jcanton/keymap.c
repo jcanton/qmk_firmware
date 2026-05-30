@@ -45,7 +45,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_GRV,   KC_F1,  KC_F2,   KC_F3,   KC_F4,   KC_F5,                    KC_F6,  KC_F7,   KC_F8,   KC_MINS, KC_EQL,  KC_DEL,
     KC_TAB,   XXXXXXX,XXXXXXX, KC_UP,   XXXXXXX, XXXXXXX,                  XXXXXXX,XXXXXXX, MS_UP,   KC_LBRC, KC_RBRC, XXXXXXX,
     KC_LCTL,  XXXXXXX,KC_LEFT, KC_DOWN, KC_RGHT, XXXXXXX,                  XXXXXXX,MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, XXXXXXX,
-    KC_LSFT,  XXXXXXX,XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_LOCK, KC_F3, XXXXXXX,MS_BTN1, MS_BTN2, XXXXXXX, KC_RSFT,
+    KC_LSFT,  XXXXXXX,XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_LOCK, KC_F3, XXXXXXX,MS_BTN1, MS_BTN2, XXXXXXX, XXXXXXX, KC_RSFT,
                       KC_LCTL, KC_LOPT, KC_LCMD, _______, KC_ENT,   KC_SPC, _______, KC_RCTL, KC_ROPT, KC_RCMD
 ),
 [_LEDS] = LAYOUT(
@@ -83,6 +83,58 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     }
     return false;
 }
+
+#ifdef OLED_ENABLE
+static void render_status(void) {
+    oled_write_P(PSTR("\n\n"), false);
+    switch (get_highest_layer(layer_state)) {
+        case _QWERTY:
+            oled_write_ln_P(PSTR("QWRTY"), false);
+            break;
+        case _NAV:
+            oled_write_ln_P(PSTR("NAV  "), false);
+            break;
+        case _LEDS:
+            oled_write_ln_P(PSTR("LEDS "), false);
+            break;
+        case _ADJUST:
+            oled_write_ln_P(PSTR("ADJST"), false);
+            break;
+        default:
+            oled_write_ln_P(PSTR("?????"), false);
+            break;
+    }
+    oled_write_P(PSTR("\n\n"), false);
+    oled_write_ln_P(PSTR("LAYER"), false);
+    switch (get_highest_layer(layer_state)) {
+        case _QWERTY:
+            oled_write_ln_P(PSTR("Base "), false);
+            break;
+        case _NAV:
+            oled_write_ln_P(PSTR("Nav  "), false);
+            break;
+        case _LEDS:
+            oled_write_ln_P(PSTR("LEDs "), false);
+            break;
+        case _ADJUST:
+            oled_write_ln_P(PSTR("Adjst"), false);
+            break;
+        default:
+            oled_write_ln_P(PSTR("?????"), false);
+            break;
+    }
+    oled_write_P(PSTR("\n\n"), false);
+    led_t led_state = host_keyboard_led_state();
+    oled_write_ln_P(PSTR("CPSLK"), led_state.caps_lock);
+}
+
+bool oled_task_user(void) {
+    if (is_keyboard_master()) {
+        render_status();
+    }
+    return false;
+}
+#endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
