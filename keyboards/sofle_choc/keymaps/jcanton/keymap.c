@@ -124,7 +124,8 @@ static void render_master_status(void) {
 
 static void render_slave_status(void) {
     oled_write_P(PSTR("\n\n\n"), false);
-    oled_write_ln_P(PSTR("LED MODE"), false);
+    oled_write_ln_P(PSTR("LED"), false);
+    oled_write_ln_P(PSTR("MODE"), false);
     oled_write_P(PSTR("\n"), false);
     uint8_t flags = rgb_matrix_get_flags();
     if (flags == LED_FLAG_ALL) {
