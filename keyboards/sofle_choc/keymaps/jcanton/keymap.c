@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include <raw_hid.h>
 
 enum layer_names {
     _QWERTY,
@@ -32,6 +33,7 @@ enum custom_keycodes {
 
 static uint8_t key_brightness = 255;
 static uint8_t ugl_brightness = 128;
+static bool layer_changed = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
@@ -44,8 +46,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_NAV] = LAYOUT(
     KC_GRV,   KC_F1,  KC_F2,   KC_F3,   KC_F4,   KC_F5,                    KC_F6,  KC_F7,   KC_F8,   KC_MINS, KC_EQL,  KC_DEL,
     KC_TAB,   XXXXXXX,XXXXXXX, KC_UP,   XXXXXXX, XXXXXXX,                  XXXXXXX,XXXXXXX, MS_UP,   KC_LBRC, KC_RBRC, XXXXXXX,
-    KC_LCTL,  XXXXXXX,KC_LEFT, KC_DOWN, KC_RGHT, XXXXXXX,                  XXXXXXX,MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, XXXXXXX,
-    KC_LSFT,  XXXXXXX,XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_LOCK, KC_F3, XXXXXXX,MS_BTN1, MS_BTN2, XXXXXXX, XXXXXXX, KC_RSFT,
+    KC_LCTL,  KC_BRMU,KC_LEFT, KC_DOWN, KC_RGHT, XXXXXXX,                  XXXXXXX,MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, XXXXXXX,
+    KC_LSFT,  KC_BRMD,XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_LOCK, KC_F3, XXXXXXX,MS_BTN1, MS_BTN2, XXXXXXX, XXXXXXX, KC_RSFT,
                       KC_LCTL, KC_LOPT, KC_LCMD, _______, KC_ENT,   KC_SPC, _______, KC_RCTL, KC_ROPT, KC_RCMD
 ),
 [_LEDS] = LAYOUT(
@@ -66,7 +68,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [_QWERTY] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
+    [_QWERTY] = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
     [_NAV]     = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
     [_LEDS]    = { ENCODER_CCW_CW(KC_KEY_BRI_DN, KC_KEY_BRI_UP), ENCODER_CCW_CW(KC_UGL_BRI_DN, KC_UGL_BRI_UP) },
     [_ADJUST]  = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
@@ -161,4 +163,28 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
     }
     return true;
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    layer_changed = true;
+    return state;
+}
+
+void housekeeping_task_user(void) {
+    if (layer_changed) {
+        layer_changed = false;
+        uint8_t response[32] = {0};
+        response[0] = 0x80;
+        response[1] = get_highest_layer(layer_state);
+        raw_hid_send(response, 32);
+    }
+}
+
+void raw_hid_receive_user(uint8_t *data, uint8_t length) {
+    if (data[0] == 0x80) {
+        uint8_t response[32] = {0};
+        response[0] = 0x80;
+        response[1] = get_highest_layer(layer_state);
+        raw_hid_send(response, 32);
+    }
 }
