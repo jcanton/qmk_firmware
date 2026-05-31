@@ -25,14 +25,12 @@ enum layer_names {
 
 enum custom_keycodes {
     KC_LOCK = QK_USER,
-    KC_KEY_BRI_UP,
-    KC_KEY_BRI_DN,
-    KC_UGL_BRI_UP,
-    KC_UGL_BRI_DN,
+    KC_LED_MODE,
 };
 
-static uint8_t key_brightness = 255;
-static uint8_t ugl_brightness = 128;
+static const uint8_t led_modes[] = {LED_FLAG_ALL, LED_FLAG_KEYLIGHT, LED_FLAG_UNDERGLOW, 0};
+static const uint8_t led_mode_count = sizeof(led_modes) / sizeof(led_modes[0]);
+static uint8_t led_mode_idx = 0;
 static bool layer_changed = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -51,9 +49,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                       KC_LCTL, KC_LOPT, KC_LCMD, _______, KC_ENT,   KC_SPC, _______, KC_RCTL, KC_ROPT, KC_RCMD
 ),
 [_LEDS] = LAYOUT(
-    _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
+    _______, _______,  _______,  _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
     _______, RM_NEXT, RM_PREV, RM_HUEU, RM_HUED, RM_VALU,                  RM_VALD, RM_SATU, RM_SATD, RM_SPDU, RM_SPDD, RM_TOGG,
-    _______, KC_KEY_BRI_UP, KC_KEY_BRI_DN, _______, _______, _______,     _______, KC_UGL_BRI_UP, KC_UGL_BRI_DN, _______, _______, _______,
+    _______, KC_LED_MODE, _______, _______, _______, _______,                _______, KC_LED_MODE, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______, _______,
                       _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______
 ),
@@ -68,26 +66,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [_QWERTY] = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
+    [_QWERTY] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
     [_NAV]     = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
-    [_LEDS]    = { ENCODER_CCW_CW(KC_KEY_BRI_DN, KC_KEY_BRI_UP), ENCODER_CCW_CW(KC_UGL_BRI_DN, KC_UGL_BRI_UP) },
+    [_LEDS]    = { ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(KC_LED_MODE, RM_NEXT) },
     [_ADJUST]  = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
 };
 #endif
 
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    for (uint8_t i = led_min; i < led_max; i++) {
-        if (g_led_config.flags[i] & LED_FLAG_KEYLIGHT) {
-            rgb_matrix_set_color(i, key_brightness, key_brightness, key_brightness);
-        } else if (g_led_config.flags[i] & LED_FLAG_UNDERGLOW) {
-            rgb_matrix_set_color(i, ugl_brightness, ugl_brightness, ugl_brightness);
-        }
-    }
-    return false;
+#ifdef OLED_ENABLE
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_270;
 }
 
-#ifdef OLED_ENABLE
-static void render_status(void) {
+static void render_master_status(void) {
     oled_write_P(PSTR("\n\n"), false);
     switch (get_highest_layer(layer_state)) {
         case _QWERTY:
@@ -130,9 +121,27 @@ static void render_status(void) {
     oled_write_ln_P(PSTR("CPSLK"), led_state.caps_lock);
 }
 
+static void render_slave_status(void) {
+    oled_write_P(PSTR("\n\n\n"), false);
+    oled_write_ln_P(PSTR("LED MODE"), false);
+    oled_write_P(PSTR("\n"), false);
+    uint8_t flags = rgb_matrix_get_flags();
+    if (flags == LED_FLAG_ALL) {
+        oled_write_ln_P(PSTR("All"), false);
+    } else if (flags & LED_FLAG_KEYLIGHT) {
+        oled_write_ln_P(PSTR("Keys"), false);
+    } else if (flags & LED_FLAG_UNDERGLOW) {
+        oled_write_ln_P(PSTR("Glow"), false);
+    } else {
+        oled_write_ln_P(PSTR("Off"), false);
+    }
+}
+
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-        render_status();
+        render_master_status();
+    } else {
+        render_slave_status();
     }
     return false;
 }
@@ -149,17 +158,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 unregister_mods(MOD_LGUI | MOD_LCTL);
             }
             return false;
-        case KC_KEY_BRI_UP:
-            if (record->event.pressed && key_brightness < 255 - 31) key_brightness += 31;
-            return false;
-        case KC_KEY_BRI_DN:
-            if (record->event.pressed && key_brightness > 31) key_brightness -= 31;
-            return false;
-        case KC_UGL_BRI_UP:
-            if (record->event.pressed && ugl_brightness < 255 - 31) ugl_brightness += 31;
-            return false;
-        case KC_UGL_BRI_DN:
-            if (record->event.pressed && ugl_brightness > 31) ugl_brightness -= 31;
+        case KC_LED_MODE:
+            if (record->event.pressed) {
+                led_mode_idx = (led_mode_idx + 1) % led_mode_count;
+                rgb_matrix_set_flags(led_modes[led_mode_idx]);
+                if (led_modes[led_mode_idx] == 0) {
+                    rgb_matrix_set_color_all(0, 0, 0);
+                }
+            }
             return false;
     }
     return true;
