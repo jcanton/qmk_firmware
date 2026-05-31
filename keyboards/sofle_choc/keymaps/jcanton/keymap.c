@@ -26,6 +26,7 @@ enum layer_names {
 enum custom_keycodes {
     KC_LOCK = QK_USER,
     KC_LED_MODE,
+    KC_VIZ_TOGGLE,
 };
 
 static const uint8_t led_modes[] = {LED_FLAG_ALL, LED_FLAG_KEYLIGHT, LED_FLAG_UNDERGLOW, 0};
@@ -49,7 +50,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                       KC_LCTL, KC_LOPT, KC_LCMD, _______, KC_ENT,   KC_SPC, _______, KC_RCTL, KC_ROPT, KC_RCMD
 ),
 [_LEDS] = LAYOUT(
-    _______, _______,  _______,  _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
+    _______, _______,  _______,  _______, _______, _______,                   _______, _______, _______, _______, _______, KC_VIZ_TOGGLE,
     _______, RM_NEXT, RM_PREV, RM_HUEU, RM_HUED, RM_VALU,                  RM_VALD, RM_SATU, RM_SATD, RM_SPDU, RM_SPDD, RM_TOGG,
     _______, KC_LED_MODE, _______, _______, _______, _______,                _______, KC_LED_MODE, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______, _______,
@@ -165,6 +166,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (led_modes[led_mode_idx] == 0) {
                     rgb_matrix_set_color_all(0, 0, 0);
                 }
+            }
+            return false;
+        case KC_VIZ_TOGGLE:
+            if (record->event.pressed) {
+                uint8_t response[32] = {0};
+                response[0] = 0x81;
+                raw_hid_send(response, 32);
             }
             return false;
     }
