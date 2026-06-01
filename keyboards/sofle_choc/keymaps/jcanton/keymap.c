@@ -178,7 +178,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 raw_hid_send(response, 32);
             }
             return false;
-        case KC_NAV_OR_LEDS:
+        case KC_NAVLEDS:
             if (record->event.pressed) {
                 if (get_mods() & MOD_BIT(KC_RCTL)) {
                     nav_or_leds_is_leds = true;
