@@ -24,6 +24,8 @@
         "driver": "ws2812",
         "split_count": [35, 35],
         "animations": {
+            "breathing": true,
+            "band_val": true,
             "cycle_out_in": true,
             "cycle_out_in_dual": true,
             "rainbow_moving_chevron": true,
@@ -31,9 +33,10 @@
             "rainbow_beacon": true,
             "rainbow_pinwheels": true,
             "jellybean_raindrops": true,
+            "gradient_up_down": true,
             "hue_wave": true,
             "pixel_fractal": true,
-            "pixel_rain": true
+            "solid_color": true
         },
         "layout": [
             {"x": 16, "y": 20, "flags": 2},
