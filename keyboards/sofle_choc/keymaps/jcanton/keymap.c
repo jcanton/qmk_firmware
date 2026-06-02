@@ -82,53 +82,23 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_master_status(void) {
-    oled_write_P(PSTR("\n\n"), false);
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_ln_P(PSTR("QWRTY"), false);
-            break;
-        case _SYMB:
-            oled_write_ln_P(PSTR("SYMB "), false);
-            break;
-        case _NAV:
-            oled_write_ln_P(PSTR("NAV  "), false);
-            break;
-        case _LEDS:
-            oled_write_ln_P(PSTR("LEDS "), false);
-            break;
-        default:
-            oled_write_ln_P(PSTR("?????"), false);
-            break;
-    }
-    oled_write_P(PSTR("\n\n"), false);
-    oled_write_ln_P(PSTR("LAYER"), false);
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_ln_P(PSTR("Base "), false);
-            break;
-        case _SYMB:
-            oled_write_ln_P(PSTR("Symb "), false);
-            break;
-        case _NAV:
-            oled_write_ln_P(PSTR("Nav  "), false);
-            break;
-        case _LEDS:
-            oled_write_ln_P(PSTR("LEDs "), false);
-            break;
-        default:
-            oled_write_ln_P(PSTR("?????"), false);
-            break;
-    }
-    oled_write_P(PSTR("\n\n"), false);
+    uint8_t current = get_highest_layer(layer_state);
+    oled_write_P(PSTR("QWRTY"), current == _QWERTY);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("SYMB "), current == _SYMB);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("NAV  "), current == _NAV);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("LEDS "), current == _LEDS);
+    oled_write_ln_P(PSTR(""), false);
     led_t led_state = host_keyboard_led_state();
     oled_write_ln_P(PSTR("CPSLK"), led_state.caps_lock);
 }
 
 static void render_slave_status(void) {
-    oled_write_P(PSTR("\n\n\n"), false);
     oled_write_ln_P(PSTR("LED"), false);
     oled_write_ln_P(PSTR("MODE"), false);
-    oled_write_P(PSTR("\n"), false);
+    oled_write_P(PSTR(""), false);
     uint8_t flags = rgb_matrix_get_flags();
     if (flags == LED_FLAG_ALL) {
         oled_write_ln_P(PSTR("All"), false);
@@ -139,11 +109,19 @@ static void render_slave_status(void) {
     } else {
         oled_write_ln_P(PSTR("Off"), false);
     }
-    oled_write_P(PSTR("\n"), false);
+    oled_write_ln_P(PSTR(""), false);
     const char *name = rgb_matrix_get_mode_name(rgb_matrix_get_mode());
     char buf[6] = {0};
     for (uint8_t i = 0; i < 5 && name[i]; i++) buf[i] = name[i];
     oled_write_ln(buf, false);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("/\\_/") , false);
+    oled_write_ln_P(PSTR("\\") , false);
+    oled_write_P(PSTR("(o.o)") , false);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR(" >^<")  , false);
+    oled_write_ln_P(PSTR(""), false);
 }
 
 bool oled_task_user(void) {
