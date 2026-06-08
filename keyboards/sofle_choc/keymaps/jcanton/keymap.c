@@ -81,6 +81,18 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_270;
 }
 
+static void render_logo(void) {
+    static const char PROGMEM raw_logo[] = {
+        0,  0,  0,  0,  0,  0,  0,  0,  0,128, 64, 32, 16, 16,  8,  8,  8,  8,
+        16, 16, 32, 64,128,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,254,  1,  0, 24, 36, 36, 24,  0,  0,  0, 24, 36, 36, 24,
+        1,254,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        31, 32, 24,  4, 24, 32, 24,  4, 24, 32, 24,  4, 24, 32, 24,  7,  0,  0,
+        0,  0,  0,  0,  0,  0,
+    };
+    oled_write_raw_P(raw_logo, sizeof(raw_logo));
+}
+
 static void render_master_status(void) {
     uint8_t current = get_highest_layer(layer_state);
     oled_write_P(PSTR("QWRTY"), current == _QWERTY);
@@ -93,6 +105,8 @@ static void render_master_status(void) {
     oled_write_ln_P(PSTR(""), false);
     led_t led_state = host_keyboard_led_state();
     oled_write_ln_P(PSTR("CPSLK"), led_state.caps_lock);
+    oled_write_ln_P(PSTR(""), false);
+    render_logo();
 }
 
 static void render_slave_status(void) {
@@ -163,7 +177,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case KC_NAVLEDS:
             if (record->event.pressed) {
-                if (get_mods() & MOD_BIT(KC_LCTL)) {
+                if (get_mods() & MOD_BIT(KC_RSFT)) {
                     nav_or_leds_is_leds = true;
                     layer_on(_LEDS);
                 } else {
