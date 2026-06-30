@@ -1,4 +1,4 @@
-/* Copyright 2023 Brian Low
+/* Copyright 2025 Jacopo Canton
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,3 +27,5 @@
 #define RGB_MATRIX_SLEEP     // turn off effects when suspended
 #define SPLIT_TRANSPORT_MIRROR             // If LED_MATRIX_KEYPRESSES or LED_MATRIX_KEYRELEASES is enabled, you also will want to enable SPLIT_TRANSPORT_MIRROR
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 100  // limits maximum brightness of LEDs (max 255). Higher may cause the controller to crash.
+
+#define BOTH_SHIFTS_TURNS_ON_CAPS_WORD     // press Left+Right Shift together to start Caps Word
