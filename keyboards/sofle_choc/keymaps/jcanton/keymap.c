@@ -34,7 +34,7 @@ static const uint8_t led_modes[] = {LED_FLAG_ALL, LED_FLAG_KEYLIGHT, LED_FLAG_UN
 static const uint8_t led_mode_count = sizeof(led_modes) / sizeof(led_modes[0]);
 static uint8_t led_mode_idx = 0;
 static bool layer_changed = false;
-static bool nav_or_leds_is_leds = false;
+static bool nav_held = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
@@ -178,18 +178,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_NAVLEDS:
             if (record->event.pressed) {
                 if (get_mods() & MOD_BIT(KC_RSFT)) {
-                    nav_or_leds_is_leds = true;
-                    layer_on(_LEDS);
+                    // Shift + thumb: toggle the LEDS layer (latches until pressed again)
+                    layer_invert(_LEDS);
+                    nav_held = false;
                 } else {
-                    nav_or_leds_is_leds = false;
+                    // thumb only: momentary NAV while held
+                    nav_held = true;
                     layer_on(_NAV);
                 }
-            } else {
-                if (nav_or_leds_is_leds) {
-                    layer_off(_LEDS);
-                } else {
-                    layer_off(_NAV);
-                }
+            } else if (nav_held) {
+                nav_held = false;
+                layer_off(_NAV);
             }
             return false;
     }
