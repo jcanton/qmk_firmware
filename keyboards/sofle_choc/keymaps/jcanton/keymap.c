@@ -34,7 +34,7 @@ static const uint8_t led_modes[] = {LED_FLAG_ALL, LED_FLAG_KEYLIGHT, LED_FLAG_UN
 static const uint8_t led_mode_count = sizeof(led_modes) / sizeof(led_modes[0]);
 static uint8_t led_mode_idx = 0;
 static bool layer_changed = false;
-static bool nav_or_leds_is_leds = false;
+static bool nav_held = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
@@ -42,7 +42,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,   KC_Q,   KC_W,   KC_E,    KC_R,    KC_T,                         KC_Y,       KC_U,    KC_I,    KC_O,   KC_P,    KC_BSLS,
     KC_LCTL,  KC_A,   KC_S,   KC_D,    KC_F,    KC_G,                         KC_H,       KC_J,    KC_K,    KC_L,   KC_SCLN, KC_QUOT,
     KC_LSFT,  KC_Z,   KC_X,   KC_C,    KC_V,    KC_B,      KC_MUTE,  KC_MPLY, KC_N,       KC_M,    KC_COMM, KC_DOT, KC_SLSH, KC_RSFT,
-                      MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, MO(_SYMB), KC_ENT,   KC_SPC,  KC_NAVLEDS, KC_RCMD, MT(KC_ROPT, KC_LBRC), MT(KC_RCTL, KC_RBRC)
+                      MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, MO(_SYMB), KC_ENT,   KC_SPC,  KC_NAVLEDS, KC_RCMD, MT(MOD_RALT, KC_LBRC), MT(MOD_RCTL, KC_RBRC)
 ),
 [_SYMB] = LAYOUT(
     KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                      KC_F6,   KC_F7,   KC_F8,   KC_MINS, KC_EQL,  KC_DEL,
@@ -178,18 +178,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_NAVLEDS:
             if (record->event.pressed) {
                 if (get_mods() & MOD_BIT(KC_RSFT)) {
-                    nav_or_leds_is_leds = true;
-                    layer_on(_LEDS);
+                    // Shift + thumb: toggle the LEDS layer (latches until pressed again)
+                    layer_invert(_LEDS);
+                    nav_held = false;
                 } else {
-                    nav_or_leds_is_leds = false;
+                    // thumb only: momentary NAV while held
+                    nav_held = true;
                     layer_on(_NAV);
                 }
-            } else {
-                if (nav_or_leds_is_leds) {
-                    layer_off(_LEDS);
-                } else {
-                    layer_off(_NAV);
-                }
+            } else if (nav_held) {
+                nav_held = false;
+                layer_off(_NAV);
             }
             return false;
     }
@@ -211,7 +210,7 @@ void housekeeping_task_user(void) {
     }
 }
 
-void raw_hid_receive_user(uint8_t *data, uint8_t length) {
+void raw_hid_receive(uint8_t *data, uint8_t length) {
     if (data[0] == 0x80) {
         uint8_t response[32] = {0};
         response[0] = 0x80;
