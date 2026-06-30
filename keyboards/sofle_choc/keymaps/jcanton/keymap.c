@@ -211,7 +211,7 @@ void housekeeping_task_user(void) {
     }
 }
 
-void raw_hid_receive_user(uint8_t *data, uint8_t length) {
+void raw_hid_receive(uint8_t *data, uint8_t length) {
     if (data[0] == 0x80) {
         uint8_t response[32] = {0};
         response[0] = 0x80;
