@@ -29,3 +29,8 @@
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 100  // limits maximum brightness of LEDs (max 255). Higher may cause the controller to crash.
 
 #define BOTH_SHIFTS_TURNS_ON_CAPS_WORD     // press Left+Right Shift together to start Caps Word
+
+// Tap-hold tuning: layer-taps on Space/Enter/Tab/Delete/Backspace feel laggy
+// with default TAPPING_TERM. Flow Tap sends taps immediately during fast typing.
+#define TAPPING_TERM 150
+#define FLOW_TAP_TERM 150
