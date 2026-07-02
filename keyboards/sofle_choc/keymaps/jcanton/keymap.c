@@ -41,24 +41,24 @@ static bool funleds_shift_used = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
-    KC_ESC,   KC_1,   KC_2,   KC_3,    KC_4,    KC_5,                         KC_6,       KC_7,    KC_8,    KC_9,   KC_0,    KC_BSPC,
-    KC_TAB,   KC_Q,   KC_W,   KC_E,    KC_R,    KC_T,                         KC_Y,       KC_U,    KC_I,    KC_O,   KC_P,    KC_BSLS,
-    KC_LCTL,  KC_A,   KC_S,   KC_D,    KC_F,    KC_G,                         KC_H,       KC_J,    KC_K,    KC_L,   KC_SCLN, KC_QUOT,
-    KC_LSFT,  KC_Z,   KC_X,   KC_C,    KC_V,    KC_B,      KC_MUTE,  KC_MPLY, KC_N,       KC_M,    KC_COMM, KC_DOT, KC_SLSH, KC_RSFT,
-              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, LT(_NAV, KC_TAB), LT(_MOUSE, KC_ENT), LT(_SYM, KC_SPC), KC_FUNLEDS, LT(_NUM, KC_DEL), MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
+    KC_ESC,   KC_1,   KC_2,   KC_3,    KC_4,    KC_5,                                 KC_6,       KC_7,    KC_8,    KC_9,   KC_0,    KC_BSPC,
+    KC_TAB,   KC_Q,   KC_W,   KC_E,    KC_R,    KC_T,                                 KC_Y,       KC_U,    KC_I,    KC_O,   KC_P,    KC_BSLS,
+    KC_LCTL,  KC_A,   KC_S,   KC_D,    KC_F,    KC_G,                                 KC_H,       KC_J,    KC_K,    KC_L,   KC_SCLN, KC_QUOT,
+    KC_LSFT,  KC_Z,   KC_X,   KC_C,    KC_V,    KC_B, KC_MUTE,               KC_MPLY, KC_N,       KC_M,    KC_COMM, KC_DOT, KC_SLSH, KC_RSFT,
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, LT(_NAV, KC_TAB), LT(_MOUSE, KC_ENT), LT(_SYM, KC_SPC), KC_FUNLEDS, LT(_NUM, KC_DEL), MT(MOD_RALT, KC_LBRC), MT(MOD_RCTL, KC_RBRC)
 ),
 [_NAV] = LAYOUT(
     _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
-    _______, _______, _______, _______, _______, _______,                    _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_CAPS,
-    _______, _______, _______, _______, _______, _______, _______,  _______, _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_INS,
+    _______, _______, _______, _______, _______, _______,                    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, KC_CAPS,
+    _______, _______, _______, _______, _______, _______, _______,  _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  _______, KC_INS,
               MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
 ),
 [_MOUSE] = LAYOUT(
     _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
-    _______, _______, _______, _______, _______, _______,                    _______, MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, _______,
-    _______, _______, _______, _______, _______, _______, _______,  _______, _______, MS_WHLL, MS_WHLU, MS_WHLD, MS_WHLR, _______,
+    _______, _______, _______, _______, _______, _______,                    MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______,  _______, MS_WHLL, MS_WHLU, MS_WHLD, MS_WHLR, _______, _______,
               MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        MS_BTN1, MS_BTN2, MS_BTN3, MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
 ),
 [_SYM] = LAYOUT(
@@ -93,8 +93,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [_QWERTY] = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
-    [_NAV]    = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
+    [_QWERTY] = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
+    [_NAV]    = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
     [_MOUSE]  = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
     [_SYM]    = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
     [_FUN]    = { ENCODER_CCW_CW(KC_BRID, KC_BRIU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU) },
