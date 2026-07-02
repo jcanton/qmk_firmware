@@ -87,7 +87,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______, KC_LED_MODE, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
     _______, RM_NEXT,     RM_PREV, RM_HUEU, RM_HUED, RM_VALU,                    RM_VALD, RM_SATU, RM_SATD, RM_SPDU, RM_SPDD, RM_TOGG,
     _______, _______,     _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
-              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,            KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,            KC_SPC,  KC_FUNLEDS, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
 ),
 };
 
