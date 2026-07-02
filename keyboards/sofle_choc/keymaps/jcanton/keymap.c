@@ -18,8 +18,11 @@
 
 enum layer_names {
     _QWERTY,
-    _SYMB,
     _NAV,
+    _MOUSE,
+    _SYM,
+    _FUN,
+    _NUM,
     _LEDS,
 };
 
@@ -27,14 +30,14 @@ enum custom_keycodes {
     KC_LOCK = QK_USER,
     KC_LED_MODE,
     KC_VIZ_TOGGLE,
-    KC_NAVLEDS,
+    KC_FUNLEDS,
 };
 
 static const uint8_t led_modes[] = {LED_FLAG_ALL, LED_FLAG_KEYLIGHT, LED_FLAG_UNDERGLOW, 0};
 static const uint8_t led_mode_count = sizeof(led_modes) / sizeof(led_modes[0]);
 static uint8_t led_mode_idx = 0;
 static bool layer_changed = false;
-static bool nav_held = false;
+static bool funleds_shift_used = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
@@ -42,36 +45,60 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,   KC_Q,   KC_W,   KC_E,    KC_R,    KC_T,                         KC_Y,       KC_U,    KC_I,    KC_O,   KC_P,    KC_BSLS,
     KC_LCTL,  KC_A,   KC_S,   KC_D,    KC_F,    KC_G,                         KC_H,       KC_J,    KC_K,    KC_L,   KC_SCLN, KC_QUOT,
     KC_LSFT,  KC_Z,   KC_X,   KC_C,    KC_V,    KC_B,      KC_MUTE,  KC_MPLY, KC_N,       KC_M,    KC_COMM, KC_DOT, KC_SLSH, KC_RSFT,
-                      MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, MO(_SYMB), KC_ENT,   KC_SPC,  KC_NAVLEDS, KC_RCMD, MT(MOD_RALT, KC_LBRC), MT(MOD_RCTL, KC_RBRC)
-),
-[_SYMB] = LAYOUT(
-    KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                      KC_F6,   KC_F7,   KC_F8,   KC_MINS, KC_EQL,  KC_DEL,
-    _______, KC_BRID, KC_BRIU, KC_MCTL, _______, _______,                    _______, KC_LT,   KC_GT,   KC_LBRC, KC_RBRC, _______,
-    KC_CAPS, _______, _______, _______, _______, _______,                    _______, KC_LPRN, KC_RPRN, KC_LCBR, KC_RCBR, _______,
-    _______, _______, _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
-                      _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, LT(_NAV, KC_TAB), LT(_MOUSE, KC_ENT), LT(_SYM, KC_SPC), KC_FUNLEDS, LT(_NUM, KC_DEL), MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
 ),
 [_NAV] = LAYOUT(
-    _______, MS_ACL0, MS_ACL1, MS_ACL2, _______, _______,                    _______, _______, _______, _______, _______, KC_VIZ_TOGGLE,
-    _______, _______, _______, MS_UP,   _______, _______,                    _______, _______, KC_UP,   _______, _______, _______,
-    _______, _______, MS_LEFT, MS_DOWN, MS_RGHT, _______,                    _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, KC_ENT,
-    _______, _______, _______, _______, _______, _______, KC_LOCK,  KC_F3,   _______, MS_BTN1, MS_BTN2, _______, _______, _______,
-                      _______, _______, _______, _______, _______,  _______, _______, MS_WHLU, MS_WHLD, _______
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
+    _______, _______, _______, _______, _______, _______,                    _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_CAPS,
+    _______, _______, _______, _______, _______, _______, _______,  _______, _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_INS,
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
+),
+[_MOUSE] = LAYOUT(
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
+    _______, _______, _______, _______, _______, _______,                    _______, MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, _______,
+    _______, _______, _______, _______, _______, _______, _______,  _______, _______, MS_WHLL, MS_WHLU, MS_WHLD, MS_WHLR, _______,
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        MS_BTN1, MS_BTN2, MS_BTN3, MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
+),
+[_SYM] = LAYOUT(
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+    _______, KC_GRV,  KC_LCBR, KC_RCBR, KC_LBRC, KC_RBRC,                    _______, _______, _______, _______, _______, KC_BSLS,
+    _______, KC_TILD, KC_LPRN, KC_RPRN, KC_LT,   KC_GT,                      _______, _______, _______, _______, _______, KC_QUES,
+    _______, KC_LSFT, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,  _______, _______, _______, _______, _______, _______, _______,
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
+),
+[_FUN] = LAYOUT(
+    _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                      KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, KC_F12,
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
+),
+[_NUM] = LAYOUT(
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+    _______, KC_7,    KC_8,    KC_9,    KC_MINS, KC_PLUS,                    _______, _______, _______, _______, _______, _______,
+    _______, KC_4,    KC_5,    KC_6,    KC_ASTR, KC_SLSH,                    _______, _______, _______, _______, _______, _______,
+    _______, KC_1,    KC_2,    KC_3,    KC_0,    KC_DOT,  _______,  _______, _______, _______, _______, _______, _______, _______,
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,        KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
 ),
 [_LEDS] = LAYOUT(
     _______, _______,     _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
     _______, KC_LED_MODE, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
     _______, RM_NEXT,     RM_PREV, RM_HUEU, RM_HUED, RM_VALU,                    RM_VALD, RM_SATU, RM_SATD, RM_SPDU, RM_SPDD, RM_TOGG,
     _______, _______,     _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
-                          _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______
+              MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_TAB, KC_ENT,            KC_SPC,  KC_BSPC, KC_DEL,  MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
 ),
 };
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [_QWERTY] = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
-    [_SYMB]   = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
     [_NAV]    = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
+    [_MOUSE]  = { ENCODER_CCW_CW(MS_WHLU, MS_WHLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
+    [_SYM]    = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
+    [_FUN]    = { ENCODER_CCW_CW(KC_BRID, KC_BRIU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU) },
+    [_NUM]    = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
     [_LEDS]   = { ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(KC_LED_MODE, RM_NEXT) },
 };
 #endif
@@ -97,9 +124,15 @@ static void render_master_status(void) {
     uint8_t current = get_highest_layer(layer_state);
     oled_write_P(PSTR("QWRTY"), current == _QWERTY);
     oled_write_ln_P(PSTR(""), false);
-    oled_write_P(PSTR("SYMB "), current == _SYMB);
-    oled_write_ln_P(PSTR(""), false);
     oled_write_P(PSTR("NAV  "), current == _NAV);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("MOUSE"), current == _MOUSE);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("SYM  "), current == _SYM);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("FUN  "), current == _FUN);
+    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("NUM  "), current == _NUM);
     oled_write_ln_P(PSTR(""), false);
     oled_write_P(PSTR("LEDS "), current == _LEDS);
     oled_write_ln_P(PSTR(""), false);
@@ -175,20 +208,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 raw_hid_send(response, 32);
             }
             return false;
-        case KC_NAVLEDS:
+        case KC_FUNLEDS:
             if (record->event.pressed) {
-                if (get_mods() & MOD_BIT(KC_RSFT)) {
-                    // Shift + thumb: toggle the LEDS layer (latches until pressed again)
+                if (get_mods() & MOD_MASK_SHIFT) {
                     layer_invert(_LEDS);
-                    nav_held = false;
+                    funleds_shift_used = true;
                 } else {
-                    // thumb only: momentary NAV while held
-                    nav_held = true;
-                    layer_on(_NAV);
+                    funleds_shift_used = false;
+                    layer_on(_FUN);
                 }
-            } else if (nav_held) {
-                nav_held = false;
-                layer_off(_NAV);
+            } else {
+                if (!funleds_shift_used) {
+                    layer_off(_FUN);
+                }
             }
             return false;
     }
