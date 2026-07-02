@@ -33,5 +33,4 @@
 // Tap-hold tuning: layer-taps on Space/Enter/Tab/Delete/Backspace feel laggy
 // with default TAPPING_TERM. Flow Tap sends taps immediately during fast typing.
 #define TAPPING_TERM 150
-#define TAPPING_TERM_PER_KEY
 #define FLOW_TAP_TERM 150
