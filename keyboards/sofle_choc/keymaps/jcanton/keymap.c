@@ -48,7 +48,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
               MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, LT(_NAV, KC_TAB), LT(_MOUSE, KC_ENT), LT(_SYM, KC_SPC), KC_FUNLEDS, LT(_NUM, KC_DEL), MT(MOD_RALT, KC_LBRC), MT(MOD_RCTL, KC_RBRC)
 ),
 [_NAV] = LAYOUT(
-    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______, _______,                    _______, _______, _______, KC_MINS, KC_EQL,  KC_VIZ_TOGGLE,
     _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
     _______, _______, _______, _______, _______, _______,                    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, KC_CAPS,
     _______, _______, _______, _______, _______, _______, _______,  _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  _______, KC_INS,
@@ -108,17 +108,17 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_270;
 }
 
-static void render_logo(void) {
-    static const char PROGMEM raw_logo[] = {
-        0,  0,  0,  0,  0,  0,  0,  0,  0,128, 64, 32, 16, 16,  8,  8,  8,  8,
-        16, 16, 32, 64,128,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-        0,  0,  0,  0,254,  1,  0, 24, 36, 36, 24,  0,  0,  0, 24, 36, 36, 24,
-        1,254,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-        31, 32, 24,  4, 24, 32, 24,  4, 24, 32, 24,  4, 24, 32, 24,  7,  0,  0,
-        0,  0,  0,  0,  0,  0,
-    };
-    oled_write_raw_P(raw_logo, sizeof(raw_logo));
-}
+// static void render_logo(void) {
+//     static const char PROGMEM raw_logo[] = {
+//         0,  0,  0,  0,  0,  0,  0,  0,  0,128, 64, 32, 16, 16,  8,  8,  8,  8,
+//         16, 16, 32, 64,128,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+//         0,  0,  0,  0,254,  1,  0, 24, 36, 36, 24,  0,  0,  0, 24, 36, 36, 24,
+//         1,254,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+//         31, 32, 24,  4, 24, 32, 24,  4, 24, 32, 24,  4, 24, 32, 24,  7,  0,  0,
+//         0,  0,  0,  0,  0,  0,
+//     };
+//     oled_write_raw_P(raw_logo, sizeof(raw_logo));
+// }
 
 static void render_master_status(void) {
     uint8_t current = get_highest_layer(layer_state);
@@ -138,8 +138,8 @@ static void render_master_status(void) {
     oled_write_ln_P(PSTR(""), false);
     led_t led_state = host_keyboard_led_state();
     oled_write_ln_P(PSTR("CPSLK"), led_state.caps_lock);
-    oled_write_ln_P(PSTR(""), false);
-    render_logo();
+    // oled_write_ln_P(PSTR(""), false);
+    // render_logo();
 }
 
 static void render_slave_status(void) {
