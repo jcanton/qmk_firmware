@@ -91,6 +91,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 };
 
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case LT(_MOUSE, KC_ENT):
+            return 220;
+        case LT(_NAV, KC_TAB):
+        case LT(_NUM, KC_DEL):
+            return 180;
+        case LT(_SYM, KC_SPC):
+            return 130;
+        default:
+            return TAPPING_TERM;
+    }
+}
+
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [_QWERTY] = { ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_MPRV, KC_MNXT) },
