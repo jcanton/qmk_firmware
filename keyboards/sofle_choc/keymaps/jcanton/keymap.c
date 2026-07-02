@@ -49,14 +49,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 [_NAV] = LAYOUT(
     _______, _______, _______, _______, _______, _______,                    _______, _______, _______, KC_MINS, KC_EQL,  KC_VIZ_TOGGLE,
-    _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
+    _______, _______, _______, _______, _______, _______,                    C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y), _______,
     _______, _______, _______, _______, _______, _______,                    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, KC_CAPS,
     _______, _______, _______, _______, _______, _______, _______,  _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  _______, KC_INS,
               MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, MO(_NAV), KC_ENT,          KC_SPC , MO(_SYM), KC_FUNLEDS, MT(MOD_RALT, KC_LBRC), MT(MOD_RCTL, KC_RBRC)
 ),
 [_MOUSE] = LAYOUT(
     _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______,                    _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y),
+    _______, _______, _______, _______, _______, _______,                    C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y), _______,
     _______, _______, _______, _______, _______, _______,                    MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, _______, _______,
     _______, _______, _______, _______, _______, _______, _______,  _______, MS_WHLL, MS_WHLU, MS_WHLD, MS_WHLR, _______, _______,
               MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, MO(_NAV), KC_ENT,      MS_BTN1, MS_BTN2, MS_BTN3, MT(MOD_RALT, KC_LBRC), MT(MOD_RGUI, KC_RBRC)
