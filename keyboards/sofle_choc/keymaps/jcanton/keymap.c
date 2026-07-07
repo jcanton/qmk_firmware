@@ -53,7 +53,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 [_NAV] = LAYOUT(
     _______, _______, _______, _______, _______, _______,                    _______, _______, _______, KC_MINS, KC_EQL,  KC_VIZ_TOGGLE,
-    _______, _______, _______, _______, _______, _______,                    C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y), _______,
+    _______, KC_BRID, KC_BRIU, KC_MCTL, _______, _______,                    C(KC_Z), C(KC_X), C(KC_C), C(KC_V), C(KC_Y), _______,
     _______, _______, _______, _______, _______, _______,                    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, KC_CAPS,
     _______, _______, _______, _______, _______, _______, _______,  _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  _______, KC_INS,
               MT(MOD_LCTL, KC_GRV), KC_LOPT, KC_LCMD, KC_NAVMOU, KC_ENT,     KC_SPC, KC_SYMNUM, KC_FUNLEDS, MT(MOD_RALT, KC_LBRC), MT(MOD_RCTL, KC_RBRC)
@@ -229,7 +229,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case KC_NAVMOU:
             if (record->event.pressed) {
-                navmou_layer = (get_mods() & MOD_BIT(KC_LSFT)) ? _MOUSE : _NAV;
+                navmou_layer = (get_mods() & MOD_BIT(KC_LCTL)) ? _MOUSE : _NAV;
                 layer_on(navmou_layer);
             } else {
                 layer_off(navmou_layer);
