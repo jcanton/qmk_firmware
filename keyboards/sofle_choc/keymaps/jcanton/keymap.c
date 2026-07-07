@@ -42,6 +42,7 @@ static bool layer_changed = false;
 static bool funleds_shift_used = false;
 static uint8_t navmou_layer = 0;
 static uint8_t symnum_layer = 0;
+static uint8_t del_keycode = KC_BSPC;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
@@ -187,6 +188,22 @@ bool oled_task_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
+        case KC_BSPC:
+            if (record->event.pressed) {
+                uint8_t mods = get_mods();
+                if (mods & MOD_MASK_SHIFT) {
+                    del_keycode = KC_DEL;
+                    unregister_mods(MOD_MASK_SHIFT);
+                    register_code(KC_DEL);
+                    set_mods(mods);
+                } else {
+                    del_keycode = KC_BSPC;
+                    register_code(KC_BSPC);
+                }
+            } else {
+                unregister_code(del_keycode);
+            }
+            return false;
         case KC_LOCK:
             if (record->event.pressed) {
                 register_mods(MOD_LGUI | MOD_LCTL);
