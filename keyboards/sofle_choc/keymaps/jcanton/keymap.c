@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "config.h"
 #include QMK_KEYBOARD_H
 #include <raw_hid.h>
 
@@ -43,6 +44,10 @@ static bool funleds_shift_used = false;
 static uint8_t navmou_layer = 0;
 static uint8_t symnum_layer = 0;
 static uint8_t del_keycode = KC_BSPC;
+static uint16_t lshift_press_time = 0;
+static uint16_t lshift_release_time = 0;
+static bool     lshift_pending = false;
+static bool     lshift_tapped = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT(
@@ -187,7 +192,25 @@ bool oled_task_user(void) {
 #endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed && keycode != KC_LSFT) {
+        lshift_pending = false;
+        if (keycode != KC_NAVMOU) {
+            lshift_tapped = false;
+        }
+    }
     switch (keycode) {
+        case KC_LSFT:
+            if (record->event.pressed) {
+                lshift_press_time = timer_read();
+                lshift_pending = true;
+            } else {
+                if (lshift_pending && timer_elapsed(lshift_press_time) < TAPPING_TERM) {
+                    lshift_tapped = true;
+                    lshift_release_time = timer_read();
+                }
+                lshift_pending = false;
+            }
+            return true;
         case KC_BSPC:
             if (record->event.pressed) {
                 uint8_t mods = get_mods();
@@ -246,7 +269,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case KC_NAVMOU:
             if (record->event.pressed) {
-                navmou_layer = (get_mods() & MOD_BIT(KC_LCTL)) ? _MOUSE : _NAV;
+                if (lshift_tapped && timer_elapsed(lshift_release_time) < TAPPING_TERM) {
+                    navmou_layer = _MOUSE;
+                } else {
+                    navmou_layer = _NAV;
+                }
+                lshift_tapped = false;
                 layer_on(navmou_layer);
             } else {
                 layer_off(navmou_layer);
