@@ -34,3 +34,5 @@
 // with default TAPPING_TERM. Flow Tap sends taps immediately during fast typing.
 #define TAPPING_TERM 150
 #define FLOW_TAP_TERM 150
+
+#define OLED_TIMEOUT 180000  // 3 min, was 60s default
